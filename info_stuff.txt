@@ -1,0 +1,6 @@
+KC_LBRC = Å 
+KC_SCLN = Ö 
+KC_QUOT = Ä
+
+https://precondition.github.io/home-row-mods
+https://jayliu50.github.io/qmk-cheatsheet/
