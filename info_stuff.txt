@@ -4,3 +4,6 @@ KC_QUOT = Ä
 
 https://precondition.github.io/home-row-mods
 https://jayliu50.github.io/qmk-cheatsheet/
+
+macro for modifier hold / layer change press
+https://github.com/qmk/qmk_firmware/issues/4611
