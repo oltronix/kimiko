@@ -1,4 +1,4 @@
-qmk json2c specials.json -o keymap.c
+qmk json2c restructure.json -o keymap.c
 src=$(pwd)
 cd  ~/_code/qmk/qmk_firmware/keyboards/keycapsss/kimiko/keymaps/mymap/
 cat "$src/keymap.c" combos.mc > keymap.c
