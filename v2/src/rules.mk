@@ -8,7 +8,7 @@ RGBLIGHT_ENABLE = no      # Enable keyboard RGB underglow
 # This does not affect QMK Macros and Layers
 LTO_ENABLE = yes
 
-COMBO_ENABLE = no
+COMBO_ENABLE = yes
 KEY_OVERRIDE_ENABLE = yes
 
 SRC += oneshot.c
