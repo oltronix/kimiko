@@ -14,18 +14,14 @@ enum layers {
     _CONF
 };
 
-#define L_MODL MO(1)
-#define R_MODL MO(2)
+#define L_MODL MO(_WINNAV)
+#define R_MODL MO(_VINAV)
 
-#define R_SYML MO(6) //Toggle symbols on left hand
-#define R_NAV MO(8) //Toggle mouse layer for left
-#define L_SYML MO(6) //Toggle symbols on right hand
-#define L_NUMP MO(5) //Toggle num pad on right hand
-#define L_NAV MO(7)  //Toggle navigation on right hand
-
+#define R_SYML MO(_SYM) //Toggle symbols on left hand
+#define NAV MO(_MOUSE) //Toggle mouse layer for left
+#define L_SYML MO(_SYM) //Toggle symbols on right hand
+#define L_NUMP MO(_NUM) //Toggle num pad on right hand
 enum combo_events {
-  L_NAVC,
-  R_NAVC,
   L_CTRL,
   R_CTRL,
   L_ALT,
@@ -64,9 +60,6 @@ combo_t key_combos[COMBO_LENGTH] = {
 
   COMBO(cmb_W_T, KC_LGUI),
   COMBO(cmb_Y_N, KC_LGUI),
-
-  COMBO(cmb_P_G, KC_LALT),
-  COMBO(cmb_L_M, KC_LALT)
 };
 
 /* OVERRIDES */
@@ -221,10 +214,8 @@ bool is_oneshot_ignored_key(uint16_t keycode) {
     case OS_CTRL:
     case OS_ALT:
     case OS_GUI:
-    case R_NAV:
     case L_SYML:
     case L_NUMP:
-    case L_NAV:
         return true;
     default:
         return false;
