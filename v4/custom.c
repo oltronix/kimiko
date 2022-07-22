@@ -241,6 +241,8 @@ void ll_finished(qk_tap_dance_state_t *state, void *user_data) {
     switch (lltap_state.state) {
         case TD_SINGLE_HOLD: layer_on(_WINNAV); break;
         case TD_DOUBLE_HOLD: layer_on(_SYM); break;
+        default:
+            break;
     }
 }
 
@@ -248,8 +250,10 @@ void ll_reset(qk_tap_dance_state_t *state, void *user_data) {
     switch (lltap_state.state) {
         case TD_SINGLE_HOLD: layer_off(_WINNAV); break;
         case TD_DOUBLE_HOLD: layer_off(_SYM); break;
+        default:
+            break;
     }
-    xtap_state.state = TD_NONE;
+    lltap_state.state = TD_NONE;
 }
 
 // Associate our tap dance key with its functionality
