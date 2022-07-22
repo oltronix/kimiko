@@ -155,7 +155,7 @@
       "ANY(ALT_TAB)",
       "KC_TRNS",
       "LGUI(KC_7)",
-      "KC_TRNS",
+      "LCTL(KC_A)",
       "LCTL(KC_Y)",
       "KC_LEFT",
       "KC_DOWN",
