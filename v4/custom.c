@@ -2,6 +2,7 @@
 
 #include "oneshot.h"
 #include "swapper.h"
+#include "tapdance.h"
 
 enum layers {
     _COLEMK,
@@ -88,6 +89,12 @@ enum custom_keycodes {          // Make sure have the awesome keycode ready
     VILEFT,
     VIRIGHT,
     VTOGGLE
+};
+
+// Tap dance enums
+enum {
+    L_LAYER_DANCE,
+    SOME_OTHER_DANCE
 };
 
 void handle_vikey(
@@ -221,3 +228,31 @@ bool is_oneshot_ignored_key(uint16_t keycode) {
         return false;
     }
 }
+
+
+// Create an instance of 'td_tap_t' for the 'x' tap dance.
+static td_tap_t lltap_state = {
+    .is_press_action = true,
+    .state = TD_NONE
+};
+
+void ll_finished(qk_tap_dance_state_t *state, void *user_data) {
+    lltap_state.state = hold_me(state);
+    switch (lltap_state.state) {
+        case TD_SINGLE_HOLD: layer_on(_WINNAV); break;
+        case TD_DOUBLE_HOLD: layer_on(_SYM); break;
+    }
+}
+
+void ll_reset(qk_tap_dance_state_t *state, void *user_data) {
+    switch (lltap_state.state) {
+        case TD_SINGLE_HOLD: layer_off(_WINNAV); break;
+        case TD_DOUBLE_HOLD: layer_off(_SYM); break;
+    }
+    xtap_state.state = TD_NONE;
+}
+
+// Associate our tap dance key with its functionality
+qk_tap_dance_action_t tap_dance_actions[] = {
+    [L_LAYER_DANCE] = ACTION_TAP_DANCE_FN_ADVANCED_TIME(NULL, ll_finished, ll_reset, 275)
+};
