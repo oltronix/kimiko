@@ -12,7 +12,8 @@ enum layers {
     _NUM,
     _SYM,
     _MOUSE,
-    _CONF
+    _CONF,
+    _SELECT
 };
 
 #define L_MODL MO(_WINNAV)
@@ -240,7 +241,7 @@ void ll_finished(qk_tap_dance_state_t *state, void *user_data) {
     lltap_state.state = hold_me(state);
     switch (lltap_state.state) {
         case TD_SINGLE_HOLD: layer_on(_WINNAV); break;
-        case TD_DOUBLE_HOLD: layer_on(_SYM); break;
+        case TD_DOUBLE_HOLD: layer_on(_SELECT); break;
         default:
             break;
     }
@@ -249,7 +250,7 @@ void ll_finished(qk_tap_dance_state_t *state, void *user_data) {
 void ll_reset(qk_tap_dance_state_t *state, void *user_data) {
     switch (lltap_state.state) {
         case TD_SINGLE_HOLD: layer_off(_WINNAV); break;
-        case TD_DOUBLE_HOLD: layer_off(_SYM); break;
+        case TD_DOUBLE_HOLD: layer_off(_SELECT); break;
         default:
             break;
     }
