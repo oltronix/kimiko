@@ -24,6 +24,7 @@
 #define COMBO_HOLD_TERM 100
 #define COMBO_TERM 50
 #define COMBO_ONLY_FROM_LAYER 0
+#define TAPPING_TERM 150
 // #define MASTER_RIGHT
 // #define EE_HANDS
 

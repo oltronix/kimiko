@@ -224,12 +224,12 @@ bool is_oneshot_ignored_key(uint16_t keycode) {
     case OS_GUI:
     case L_SYML:
     case L_NUMP:
+    case TD(L_LAYER_DANCE):
         return true;
     default:
         return false;
     }
 }
-
 
 // Create an instance of 'td_tap_t' for the 'x' tap dance.
 static td_tap_t lltap_state = {
@@ -261,3 +261,14 @@ void ll_reset(qk_tap_dance_state_t *state, void *user_data) {
 qk_tap_dance_action_t tap_dance_actions[] = {
     [L_LAYER_DANCE] = ACTION_TAP_DANCE_FN_ADVANCED_TIME(NULL, ll_finished, ll_reset, 275)
 };
+
+bool get_permissive_hold(uint16_t keycode, keyrecord_t *record) {
+    switch (keycode) {
+        case TD(L_LAYER_DANCE):
+            // Immediately select the hold action when another key is tapped.
+            return true;
+        default:
+            // Do not select the hold action when another key is tapped.
+            return false;
+    }
+}
