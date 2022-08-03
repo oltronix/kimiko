@@ -25,6 +25,7 @@
 #define COMBO_TERM 50
 #define COMBO_ONLY_FROM_LAYER 0
 #define TAPPING_TERM 150
+#define PERMISSIVE_HOLD_PER_KEY
 // #define MASTER_RIGHT
 // #define EE_HANDS
 
