@@ -2,6 +2,7 @@
 
 #include "oneshot.h"
 #include "swapper.h"
+#include "tapdance.h"
 
 enum layers {
     _COLEMK,
@@ -11,7 +12,8 @@ enum layers {
     _NUM,
     _SYM,
     _MOUSE,
-    _CONF
+    _CONF,
+    _SELECT
 };
 
 #define L_MODL MO(_WINNAV)
@@ -90,6 +92,12 @@ enum custom_keycodes {          // Make sure have the awesome keycode ready
     VTOGGLE
 };
 
+// Tap dance enums
+enum {
+    L_LAYER_DANCE,
+    SOME_OTHER_DANCE
+};
+
 void handle_vikey(
     uint16_t keycode,
     bool vi_active,
@@ -156,6 +164,11 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     handle_vikey(keycode, vi_mode_active, VIDOWN, KC_DOWN, KC_J, record);
     handle_vikey(keycode, vi_mode_active, VILEFT, KC_LEFT, KC_H, record);
     handle_vikey(keycode, vi_mode_active, VIRIGHT, KC_RIGHT, KC_L, record);
+  
+    return true;
+}
+
+void post_process_record_user(uint16_t keycode, keyrecord_t *record) {
   switch (keycode){
         case ALT_TAB: // super alt tab macro
             if (record->event.pressed) {
@@ -189,9 +202,8 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             if (record->event.pressed) {
                 vi_mode_active = !vi_mode_active;
             }
-        return false;
+            break;
      }
-  return true;
 }
 
 
@@ -216,8 +228,51 @@ bool is_oneshot_ignored_key(uint16_t keycode) {
     case OS_GUI:
     case L_SYML:
     case L_NUMP:
+    case TD(L_LAYER_DANCE):
         return true;
     default:
         return false;
+    }
+}
+
+// Create an instance of 'td_tap_t' for the 'x' tap dance.
+static td_tap_t lltap_state = {
+    .is_press_action = true,
+    .state = TD_NONE
+};
+
+void ll_finished(qk_tap_dance_state_t *state, void *user_data) {
+    lltap_state.state = hold_me(state);
+    switch (lltap_state.state) {
+        case TD_SINGLE_HOLD: layer_on(_WINNAV); break;
+        case TD_DOUBLE_HOLD: layer_on(_SELECT); break;
+        default:
+            break;
+    }
+}
+
+void ll_reset(qk_tap_dance_state_t *state, void *user_data) {
+    switch (lltap_state.state) {
+        case TD_SINGLE_HOLD: layer_off(_WINNAV); break;
+        case TD_DOUBLE_HOLD: layer_off(_SELECT); break;
+        default:
+            break;
+    }
+    lltap_state.state = TD_NONE;
+}
+
+// Associate our tap dance key with its functionality
+qk_tap_dance_action_t tap_dance_actions[] = {
+    [L_LAYER_DANCE] = ACTION_TAP_DANCE_FN_ADVANCED_TIME(NULL, ll_finished, ll_reset, 275)
+};
+
+bool get_permissive_hold(uint16_t keycode, keyrecord_t *record) {
+    switch (keycode) {
+        case TD(L_LAYER_DANCE):
+            // Immediately select the hold action when another key is tapped.
+            return true;
+        default:
+            // Do not select the hold action when another key is tapped.
+            return false;
     }
 }
