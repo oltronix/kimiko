@@ -164,6 +164,11 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     handle_vikey(keycode, vi_mode_active, VIDOWN, KC_DOWN, KC_J, record);
     handle_vikey(keycode, vi_mode_active, VILEFT, KC_LEFT, KC_H, record);
     handle_vikey(keycode, vi_mode_active, VIRIGHT, KC_RIGHT, KC_L, record);
+  
+    return true;
+}
+
+void post_process_record_user(uint16_t keycode, keyrecord_t *record) {
   switch (keycode){
         case ALT_TAB: // super alt tab macro
             if (record->event.pressed) {
@@ -197,9 +202,8 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
             if (record->event.pressed) {
                 vi_mode_active = !vi_mode_active;
             }
-        return false;
+            break;
      }
-  return true;
 }
 
 
