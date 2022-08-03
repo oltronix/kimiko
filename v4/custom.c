@@ -3,6 +3,7 @@
 #include "oneshot.h"
 #include "swapper.h"
 #include "tapdance.h"
+#include "achordion.h"
 
 enum layers {
     _COLEMK,
@@ -144,6 +145,7 @@ oneshot_state os_alt_state = os_up_unqueued;
 oneshot_state os_gui_state = os_up_unqueued;
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    if (!process_achordion(keycode, record)) { return false; }
     update_oneshot(
         &os_shft_state, KC_LSFT, OS_SHFT,
         keycode, record
@@ -275,4 +277,8 @@ bool get_permissive_hold(uint16_t keycode, keyrecord_t *record) {
             // Do not select the hold action when another key is tapped.
             return false;
     }
+}
+
+void matrix_scan_user(void) {
+  achordion_task();
 }
