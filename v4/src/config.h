@@ -20,11 +20,6 @@
 /* Select hand configuration */
 #define MASTER_LEFT
 
-#define COMBO_MUST_HOLD_MODS
-#define COMBO_HOLD_TERM 100
-#define COMBO_TERM 50
-#define COMBO_ONLY_FROM_LAYER 0
-
 #define TAPPING_TERM 180
 #define IGNORE_MOD_TAP_INTERRUPT
 #define PERMISSIVE_HOLD

@@ -20,50 +20,14 @@ enum layers {
 #define L_MODL MO(_WINNAV)
 #define R_MODL MO(_VINAV)
 
+#define L_LT_SYML_F LT(_SYM, KC_F)
+#define R_LT_SYML_U LT(_SYM, KC_U)
+#define L_LT_NUM_G LT(_NUM, KC_G)
+
 #define R_SYML MO(_SYM) //Toggle symbols on left hand
 #define NAV MO(_MOUSE) //Toggle mouse layer for left
 #define L_SYML MO(_SYM) //Toggle symbols on right hand
 #define L_NUMP MO(_NUM) //Toggle num pad on right hand
-enum combo_events {
-  L_CTRL,
-  R_CTRL,
-  L_ALT,
-  R_ALT,
-  L_GUI,
-  R_GUI,
-  L_SYM,
-  R_SYM,
-  COMBO_LENGTH
-};
-uint16_t COMBO_LEN = COMBO_LENGTH;
-
-const uint16_t PROGMEM cmb_F_T[] = {KC_F, KC_T, COMBO_END};
-const uint16_t PROGMEM cmb_U_N[] = {KC_U, KC_N, COMBO_END};
-
-const uint16_t PROGMEM cmb_S_D[] = {KC_S, KC_D, COMBO_END};
-const uint16_t PROGMEM cmb_E_H[] = {KC_E, KC_H, COMBO_END};
-
-const uint16_t PROGMEM cmb_R_D[] = {KC_R, KC_D, COMBO_END};
-const uint16_t PROGMEM cmb_I_H[] = {KC_I, KC_H, COMBO_END};
-
-const uint16_t PROGMEM cmb_W_T[] = {KC_W, KC_T, COMBO_END};
-const uint16_t PROGMEM cmb_Y_N[] = {KC_Y, KC_N, COMBO_END};
-
-const uint16_t PROGMEM cmb_P_G[] = {KC_P, KC_G, COMBO_END};
-const uint16_t PROGMEM cmb_L_M[] = {KC_L, KC_M, COMBO_END};
-
-combo_t key_combos[COMBO_LENGTH] = {
-  COMBO(cmb_F_T, L_SYML),
-  COMBO(cmb_U_N, R_SYML),
-  COMBO(cmb_S_D, L_NUMP),
-  COMBO(cmb_E_H, L_NUMP),
-  
-  COMBO(cmb_R_D, KC_LALT),
-  COMBO(cmb_I_H, KC_LALT),
-
-  COMBO(cmb_W_T, KC_LGUI),
-  COMBO(cmb_Y_N, KC_LGUI),
-};
 
 /* OVERRIDES */
 
@@ -281,4 +245,16 @@ bool get_permissive_hold(uint16_t keycode, keyrecord_t *record) {
 
 void matrix_scan_user(void) {
   achordion_task();
+}
+
+bool achordion_chord(uint16_t tap_hold_keycode,
+                     keyrecord_t* tap_hold_record,
+                     uint16_t other_keycode,
+                     keyrecord_t* other_record) {
+  
+  if (other_keycode == LSFT_T(KC_ENT) || other_keycode == RSFT_T(KC_ESC))
+    return true;
+      
+  // Otherwise, follow the opposite hands rule.
+  return achordion_opposite_hands(tap_hold_record, other_record);
 }
