@@ -31,6 +31,7 @@ enum layers {
 #define L_SYML MO(_SYM) //Toggle symbols on right hand
 #define L_NUMP MO(_NUM) //Toggle num pad on right hand
 
+
 /* OVERRIDES */
 
 ///const key_override_t delete_key_override = ko_make_basic(MOD_MASK_SHIFT, KC_BSPC, KC_DEL);
@@ -47,6 +48,8 @@ bool is_ctl_tab_active = false;
 enum custom_keycodes {          // Make sure have the awesome keycode ready
   ALT_TAB = SAFE_RANGE,
   CTL_TAB, 
+  SFT_ALT_TAB,
+  SFT_CTL_TAB,
 // Custom oneshot mod implementation with no timers.
     OS_SHFT,
     OS_CTRL,
@@ -132,19 +135,35 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     handle_vikey(keycode, vi_mode_active, VIDOWN, KC_DOWN, KC_J, record);
     handle_vikey(keycode, vi_mode_active, VILEFT, KC_LEFT, KC_H, record);
     handle_vikey(keycode, vi_mode_active, VIRIGHT, KC_RIGHT, KC_L, record);
-  
+
+    switch (keycode){
+        case KC_TAB:
+        case LSFT(KC_TAB):
+            if (record->event.pressed) {
+                if (is_alt_tab_active) {
+                    unregister_code(KC_LALT);
+                    is_alt_tab_active = false;
+                }
+                if (is_ctl_tab_active) {
+                    unregister_code(KC_LCTL);
+                    is_ctl_tab_active = false;
+                }
+            }
+            break;
+    }
     return true;
 }
 
 void post_process_record_user(uint16_t keycode, keyrecord_t *record) {
-  switch (keycode){
+    switch (keycode){
         case ALT_TAB: // super alt tab macro
+        case SFT_ALT_TAB:
             if (record->event.pressed) {
                 if (!is_alt_tab_active) {
                     is_alt_tab_active = true;
                     register_code(KC_LALT);
                 }
-                if (get_mods() & MOD_MASK_SHIFT)
+                if ((get_mods() & MOD_MASK_SHIFT) || keycode == SFT_ALT_TAB)
                   register_code16(LSFT(KC_TAB));
                 else
                   register_code(KC_TAB);
@@ -153,12 +172,13 @@ void post_process_record_user(uint16_t keycode, keyrecord_t *record) {
             }
             break;
         case CTL_TAB: // super alt tab macro
+        case SFT_CTL_TAB:
             if (record->event.pressed) {
                 if (!is_ctl_tab_active) {
                     is_ctl_tab_active = true;
                     register_code(KC_LCTL);
                 }
-                if (get_mods() & MOD_MASK_SHIFT)
+                if ((get_mods() & MOD_MASK_SHIFT) || keycode == SFT_CTL_TAB)
                   register_code16(LSFT(KC_TAB));
                 else
                   register_code(KC_TAB);
@@ -233,6 +253,17 @@ void ll_reset(qk_tap_dance_state_t *state, void *user_data) {
 qk_tap_dance_action_t tap_dance_actions[] = {
     [L_LAYER_DANCE] = ACTION_TAP_DANCE_FN_ADVANCED_TIME(NULL, ll_finished, ll_reset, 275)
 };
+
+/// tapping-hold decision stuff
+
+uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
+    switch (keycode) {
+        case L_LT_NAV_SPC:
+            return TAPPING_TERM + 250;
+        default:
+            return TAPPING_TERM;
+    }
+}
 
 bool get_permissive_hold(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
