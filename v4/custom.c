@@ -23,7 +23,7 @@ enum layers {
 #define L_LT_SYML_F LT(_SYM, KC_F)
 #define R_LT_SYML_U LT(_SYM, KC_U)
 #define L_LT_NUM_G LT(_NUM, KC_G)
-#define L_LT_NAV_SPC LT(_VINAV, KC_SPC)
+#define L_LT_NAV_ENT LT(_VINAV, KC_ENT)
 #define L_LAYER_KEY TD(L_LAYER_DANCE)
 
 #define R_SYML MO(_SYM) //Toggle symbols on left hand
@@ -258,7 +258,7 @@ qk_tap_dance_action_t tap_dance_actions[] = {
 
 uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
-        case L_LT_NAV_SPC:
+        case L_LT_NAV_ENT:
             return TAPPING_TERM + 250;
         default:
             return TAPPING_TERM;
@@ -287,7 +287,7 @@ bool achordion_chord(uint16_t tap_hold_keycode,
   
   if (other_keycode == LSFT_T(KC_ENT) || other_keycode == RSFT_T(KC_ESC))
     return true;
-  if (tap_hold_keycode == L_LT_NAV_SPC)
+  if (tap_hold_keycode == L_LT_NAV_ENT)
     return true;
       
   // Otherwise, follow the opposite hands rule.
