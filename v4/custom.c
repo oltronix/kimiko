@@ -259,7 +259,7 @@ qk_tap_dance_action_t tap_dance_actions[] = {
 uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
         case L_LT_NAV_ENT:
-            return TAPPING_TERM + 250;
+            return TAPPING_TERM;
         default:
             return TAPPING_TERM;
     }
@@ -268,6 +268,7 @@ uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
 bool get_permissive_hold(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
         case TD(L_LAYER_DANCE):
+        case L_LT_NAV_ENT:
             // Immediately select the hold action when another key is tapped.
             return true;
         default:
