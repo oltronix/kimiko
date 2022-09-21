@@ -251,7 +251,7 @@ void ll_reset(qk_tap_dance_state_t *state, void *user_data) {
 
 // Associate our tap dance key with its functionality
 qk_tap_dance_action_t tap_dance_actions[] = {
-    [L_LAYER_DANCE] = ACTION_TAP_DANCE_FN_ADVANCED_TIME(NULL, ll_finished, ll_reset, 275)
+    [L_LAYER_DANCE] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, ll_finished, ll_reset)
 };
 
 /// tapping-hold decision stuff
