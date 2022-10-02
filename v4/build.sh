@@ -1,8 +1,9 @@
 V="v4"
+cd v4
 qmk json2c keymap.json -o build/keymap.c
 src=$(pwd)
-dest=~/_code/qmk/qmk_firmware/keyboards/keycapsss/kimiko/keymaps/$V
-rm -r pub
+dest=../qmk_firmware/keyboards/keycapsss/kimiko/keymaps/$V
+rm -rf pub
 break=$(grep -Fn "const uint16" build/keymap.c | cut -f1 -d:)
 break=$[break-1]
 
@@ -15,4 +16,4 @@ cd $dest
 qmk compile -km $V -c
 cd $src
 mkdir map
-ls ~/_code/qmk/qmk_firmware -d ~/_code/qmk/qmk_firmware/* | grep hex | xargs cp -t ./map/
+ls ../qmk_firmware -d ../qmk_firmware/* | grep hex | xargs cp -t ./map/
