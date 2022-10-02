@@ -3,6 +3,7 @@
 #include "oneshot.h"
 #include "swapper.h"
 #include "tapdance.h"
+#include "achordion.h"
 
 enum layers {
     _COLEMK,
@@ -19,50 +20,17 @@ enum layers {
 #define L_MODL MO(_WINNAV)
 #define R_MODL MO(_VINAV)
 
+#define L_LT_SYML_F LT(_SYM, KC_F)
+#define R_LT_SYML_U LT(_SYM, KC_U)
+#define L_LT_NUM_G LT(_NUM, KC_G)
+#define L_LT_NAV_ENT LT(_VINAV, KC_ENT)
+#define L_LAYER_KEY TD(L_LAYER_DANCE)
+
 #define R_SYML MO(_SYM) //Toggle symbols on left hand
 #define NAV MO(_MOUSE) //Toggle mouse layer for left
 #define L_SYML MO(_SYM) //Toggle symbols on right hand
 #define L_NUMP MO(_NUM) //Toggle num pad on right hand
-enum combo_events {
-  L_CTRL,
-  R_CTRL,
-  L_ALT,
-  R_ALT,
-  L_GUI,
-  R_GUI,
-  L_SYM,
-  R_SYM,
-  COMBO_LENGTH
-};
-uint16_t COMBO_LEN = COMBO_LENGTH;
 
-const uint16_t PROGMEM cmb_F_T[] = {KC_F, KC_T, COMBO_END};
-const uint16_t PROGMEM cmb_U_N[] = {KC_U, KC_N, COMBO_END};
-
-const uint16_t PROGMEM cmb_S_D[] = {KC_S, KC_D, COMBO_END};
-const uint16_t PROGMEM cmb_E_H[] = {KC_E, KC_H, COMBO_END};
-
-const uint16_t PROGMEM cmb_R_D[] = {KC_R, KC_D, COMBO_END};
-const uint16_t PROGMEM cmb_I_H[] = {KC_I, KC_H, COMBO_END};
-
-const uint16_t PROGMEM cmb_W_T[] = {KC_W, KC_T, COMBO_END};
-const uint16_t PROGMEM cmb_Y_N[] = {KC_Y, KC_N, COMBO_END};
-
-const uint16_t PROGMEM cmb_P_G[] = {KC_P, KC_G, COMBO_END};
-const uint16_t PROGMEM cmb_L_M[] = {KC_L, KC_M, COMBO_END};
-
-combo_t key_combos[COMBO_LENGTH] = {
-  COMBO(cmb_F_T, L_SYML),
-  COMBO(cmb_U_N, R_SYML),
-  COMBO(cmb_S_D, L_NUMP),
-  COMBO(cmb_E_H, L_NUMP),
-  
-  COMBO(cmb_R_D, KC_LALT),
-  COMBO(cmb_I_H, KC_LALT),
-
-  COMBO(cmb_W_T, KC_LGUI),
-  COMBO(cmb_Y_N, KC_LGUI),
-};
 
 /* OVERRIDES */
 
@@ -80,6 +48,8 @@ bool is_ctl_tab_active = false;
 enum custom_keycodes {          // Make sure have the awesome keycode ready
   ALT_TAB = SAFE_RANGE,
   CTL_TAB, 
+  SFT_ALT_TAB,
+  SFT_CTL_TAB,
 // Custom oneshot mod implementation with no timers.
     OS_SHFT,
     OS_CTRL,
@@ -144,6 +114,7 @@ oneshot_state os_alt_state = os_up_unqueued;
 oneshot_state os_gui_state = os_up_unqueued;
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+    if (!process_achordion(keycode, record)) { return false; }
     update_oneshot(
         &os_shft_state, KC_LSFT, OS_SHFT,
         keycode, record
@@ -164,19 +135,35 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     handle_vikey(keycode, vi_mode_active, VIDOWN, KC_DOWN, KC_J, record);
     handle_vikey(keycode, vi_mode_active, VILEFT, KC_LEFT, KC_H, record);
     handle_vikey(keycode, vi_mode_active, VIRIGHT, KC_RIGHT, KC_L, record);
-  
+
+    switch (keycode){
+        case KC_TAB:
+        case LSFT(KC_TAB):
+            if (record->event.pressed) {
+                if (is_alt_tab_active) {
+                    unregister_code(KC_LALT);
+                    is_alt_tab_active = false;
+                }
+                if (is_ctl_tab_active) {
+                    unregister_code(KC_LCTL);
+                    is_ctl_tab_active = false;
+                }
+            }
+            break;
+    }
     return true;
 }
 
 void post_process_record_user(uint16_t keycode, keyrecord_t *record) {
-  switch (keycode){
+    switch (keycode){
         case ALT_TAB: // super alt tab macro
+        case SFT_ALT_TAB:
             if (record->event.pressed) {
                 if (!is_alt_tab_active) {
                     is_alt_tab_active = true;
                     register_code(KC_LALT);
                 }
-                if (get_mods() & MOD_MASK_SHIFT)
+                if ((get_mods() & MOD_MASK_SHIFT) || keycode == SFT_ALT_TAB)
                   register_code16(LSFT(KC_TAB));
                 else
                   register_code(KC_TAB);
@@ -185,12 +172,13 @@ void post_process_record_user(uint16_t keycode, keyrecord_t *record) {
             }
             break;
         case CTL_TAB: // super alt tab macro
+        case SFT_CTL_TAB:
             if (record->event.pressed) {
                 if (!is_ctl_tab_active) {
                     is_ctl_tab_active = true;
                     register_code(KC_LCTL);
                 }
-                if (get_mods() & MOD_MASK_SHIFT)
+                if ((get_mods() & MOD_MASK_SHIFT) || keycode == SFT_CTL_TAB)
                   register_code16(LSFT(KC_TAB));
                 else
                   register_code(KC_TAB);
@@ -263,16 +251,68 @@ void ll_reset(qk_tap_dance_state_t *state, void *user_data) {
 
 // Associate our tap dance key with its functionality
 qk_tap_dance_action_t tap_dance_actions[] = {
-    [L_LAYER_DANCE] = ACTION_TAP_DANCE_FN_ADVANCED_TIME(NULL, ll_finished, ll_reset, 275)
+    [L_LAYER_DANCE] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, ll_finished, ll_reset)
 };
+
+/// tapping-hold decision stuff
+
+uint16_t get_tapping_term(uint16_t keycode, keyrecord_t *record) {
+    switch (keycode) {
+        case L_LT_NAV_ENT:
+            return TAPPING_TERM;
+        default:
+            return TAPPING_TERM;
+    }
+}
 
 bool get_permissive_hold(uint16_t keycode, keyrecord_t *record) {
     switch (keycode) {
         case TD(L_LAYER_DANCE):
+        case L_LT_NAV_ENT:
             // Immediately select the hold action when another key is tapped.
             return true;
         default:
             // Do not select the hold action when another key is tapped.
             return false;
+    }
+}
+
+void matrix_scan_user(void) {
+  achordion_task();
+}
+
+bool achordion_chord(uint16_t tap_hold_keycode,
+                     keyrecord_t* tap_hold_record,
+                     uint16_t other_keycode,
+                     keyrecord_t* other_record) {
+  
+  if (other_keycode == LSFT_T(KC_ENT) || other_keycode == RSFT_T(KC_ESC))
+    return true;
+  if (tap_hold_keycode == L_LT_NAV_ENT)
+    return true;
+      
+  // Otherwise, follow the opposite hands rule.
+  return achordion_opposite_hands(tap_hold_record, other_record);
+}
+
+bool caps_word_press_user(uint16_t keycode) {
+    switch (keycode) {
+        // Keycodes that continue Caps Word, with shift applied.
+        case KC_A ... KC_Z:
+        case KC_QUOT: //å
+        case KC_LBRC: //ä
+        case KC_SCLN: //ö
+            add_weak_mods(MOD_BIT(KC_LSFT));  // Apply shift to next key.
+            return true;
+
+        // Keycodes that continue Caps Word, without shifting.
+        case KC_1 ... KC_0:
+        case KC_BSPC:
+        case KC_DEL:
+        case KC_UNDS:
+            return true;
+
+        default:
+            return false;  // Deactivate Caps Word.
     }
 }
