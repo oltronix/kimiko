@@ -108,6 +108,12 @@ void handle_mcwin_key(uint16_t keycode,
             current_os = Windows;
         return;
     }
+    if (keycode == MC_END && record->event.pressed) {
+        if(current_os == Windows)
+            SEND_STRING("Win");
+        if(current_os == MacOs)
+            SEND_STRING("Mac");
+    }
     if (keycode > MC_TOGGLE && keycode < MC_END) {
         if (record->event.pressed) {
             register_code16(mcwin_keys[keycode-MC_TOGGLE-1][current_os]);

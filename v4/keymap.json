@@ -441,8 +441,8 @@
       "KC_TRNS"
     ],
     [
-      "KC_NO",
-      "KC_NO",
+      "ANY(MC_TOGGLE)",
+      "ANY(MC_END)",
       "KC_NO",
       "KC_NO",
       "KC_NO",
