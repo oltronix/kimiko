@@ -76,6 +76,12 @@ enum custom_keycodes {          // Make sure have the awesome keycode ready
     MC_PIPE,
     MC_WLEFT,
     MC_WRIGHT,
+    MC_CTLC,
+    MC_CTLX,
+    MC_CTLV,
+    MC_CTLA,
+    MC_CTLZ,
+    MC_CTLY,
     MC_END
 };
 //KC_TRNS, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,                                   KC_NO, KC_NO, LSFT(KC_RBRC), KC_NO, KC_NO, KC_NO, 
@@ -89,7 +95,13 @@ uint16_t mcwin_keys[MC_END-MC_TOGGLE][Mcw_state_count] = {
     [MC_RCURL-MC_TOGGLE-1] = {RALT(KC_0), LSA(KC_9)},
     [MC_PIPE-MC_TOGGLE-1] = {RALT(KC_NUBS), RALT(KC_7)},
     [MC_WLEFT-MC_TOGGLE-1] = {LCTL(KC_LEFT), RALT(KC_LEFT)},
-    [MC_WRIGHT-MC_TOGGLE-1] = {LCTL(KC_RIGHT), RALT(KC_RIGHT)}
+    [MC_WRIGHT-MC_TOGGLE-1] = {LCTL(KC_RIGHT), RALT(KC_RIGHT)},
+    [MC_CTLC-MC_TOGGLE-1] = {LCTL(KC_C), LGUI(KC_C)},
+    [MC_CTLX-MC_TOGGLE-1] = {LCTL(KC_X), LGUI(KC_X)},
+    [MC_CTLV-MC_TOGGLE-1] = {LCTL(KC_V), LGUI(KC_V)},
+    [MC_CTLA-MC_TOGGLE-1] = {LCTL(KC_A), LGUI(KC_A)},
+    [MC_CTLZ-MC_TOGGLE-1] = {LCTL(KC_Z), LGUI(KC_Z)},
+    [MC_CTLY-MC_TOGGLE-1] = {LCTL(KC_Y), SGUI(KC_Z)},
 };
 
 // Tap dance enums
