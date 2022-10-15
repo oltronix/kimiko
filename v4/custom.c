@@ -32,6 +32,7 @@ enum layers {
 #define L_NUMP MO(_NUM) //Toggle num pad on right hand
 
 
+
 /* OVERRIDES */
 
 ///const key_override_t delete_key_override = ko_make_basic(MOD_MASK_SHIFT, KC_BSPC, KC_DEL);
@@ -45,6 +46,13 @@ enum layers {
 
 bool is_alt_tab_active = false;
 bool is_ctl_tab_active = false;
+
+enum {
+    Windows,
+    MacOs,
+    Mcw_state_count
+} current_os = Windows;
+
 enum custom_keycodes {          // Make sure have the awesome keycode ready
   ALT_TAB = SAFE_RANGE,
   CTL_TAB, 
@@ -59,7 +67,29 @@ enum custom_keycodes {          // Make sure have the awesome keycode ready
     VIDOWN,
     VILEFT,
     VIRIGHT,
-    VTOGGLE
+    VTOGGLE,
+    // mcwin
+    MC_TOGGLE,
+    MC_BSLSH,
+    MC_LCURL,
+    MC_RCURL,
+    MC_PIPE,
+    MC_WLEFT,
+    MC_WRIGHT,
+    MC_END
+};
+//KC_TRNS, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,                                   KC_NO, KC_NO, LSFT(KC_RBRC), KC_NO, KC_NO, KC_NO, 
+//KC_TRNS, KC_NO, LSFT(KC_3), LSFT(KC_5), RALT(KC_7), RALT(KC_0),               KC_NUBS, LSFT(KC_NUBS), LSFT(KC_0), KC_PPLS, KC_PAST, KC_NO, 
+//KC_TRNS, RALT(KC_2), RALT(KC_4), LSFT(KC_2), LSFT(KC_8), LSFT(KC_9),          RALT(KC_MINS), LSFT(KC_7), LSFT(KC_MINS), LSFT(KC_1), RALT(KC_RBRC), KC_NO, 
+//KC_TRNS, KC_NO, RALT(KC_NUBS), LSFT(KC_6), RALT(KC_8), RALT(KC_9), KC_TRNS,   KC_TRNS, LSFT(KC_EQL), KC_EQL, LSFT(KC_5), LSFT(KC_NUHS), KC_NO, KC_TRNS, 
+//KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,                                  KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS),
+uint16_t mcwin_keys[MC_END-MC_TOGGLE][Mcw_state_count] = {
+    [MC_BSLSH-MC_TOGGLE-1] = {RALT(KC_MINS), KC_0},
+    [MC_LCURL-MC_TOGGLE-1] = {RALT(KC_7), KC_0},
+    [MC_RCURL-MC_TOGGLE-1] = {RALT(KC_0), KC_0},
+    [MC_PIPE-MC_TOGGLE-1] = {RALT(KC_NUBS), KC_0},
+    [MC_WLEFT-MC_TOGGLE-1] = {LCTL(KC_LEFT), KC_0},
+    [MC_WRIGHT-MC_TOGGLE-1] = {LCTL(KC_RIGHT), KC_0}
 };
 
 // Tap dance enums
@@ -67,6 +97,25 @@ enum {
     L_LAYER_DANCE,
     SOME_OTHER_DANCE
 };
+
+void handle_mcwin_key(uint16_t keycode,
+    keyrecord_t *record
+) {
+    if (keycode == MC_TOGGLE && record->event.pressed) {
+        if (current_os == Windows)
+            current_os = MacOs;
+        else
+            current_os = Windows;
+        return;
+    }
+    if (keycode > MC_TOGGLE && keycode < MC_END) {
+        if (record->event.pressed) {
+            register_code16(mcwin_keys[keycode-MC_TOGGLE-1][current_os]);
+        } else {
+            unregister_code16(mcwin_keys[keycode-MC_TOGGLE-1][current_os]);
+        }
+    }
+}
 
 void handle_vikey(
     uint16_t keycode,
@@ -135,6 +184,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     handle_vikey(keycode, vi_mode_active, VIDOWN, KC_DOWN, KC_J, record);
     handle_vikey(keycode, vi_mode_active, VILEFT, KC_LEFT, KC_H, record);
     handle_vikey(keycode, vi_mode_active, VIRIGHT, KC_RIGHT, KC_L, record);
+    handle_mcwin_key(keycode, record);
 
     switch (keycode){
         case KC_TAB:
