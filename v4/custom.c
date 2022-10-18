@@ -82,6 +82,7 @@ enum custom_keycodes {          // Make sure have the awesome keycode ready
     MC_CTLA,
     MC_CTLZ,
     MC_CTLY,
+    MC_APPTABMOD,
     MC_END
 };
 //KC_TRNS, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,                                   KC_NO, KC_NO, LSFT(KC_RBRC), KC_NO, KC_NO, KC_NO, 
@@ -102,6 +103,7 @@ uint16_t mcwin_keys[MC_END-MC_TOGGLE][Mcw_state_count] = {
     [MC_CTLA-MC_TOGGLE-1] = {LCTL(KC_A), LGUI(KC_A)},
     [MC_CTLZ-MC_TOGGLE-1] = {LCTL(KC_Z), LGUI(KC_Z)},
     [MC_CTLY-MC_TOGGLE-1] = {LCTL(KC_Y), SGUI(KC_Z)},
+    [MC_APPTABMOD-MC_TOGGLE-1] = {KC_LALT, KC_LGUI}
 };
 
 // Tap dance enums
@@ -109,6 +111,11 @@ enum {
     L_LAYER_DANCE,
     SOME_OTHER_DANCE
 };
+
+uint16_t getMcWinKey(uint16_t mcKeycode) 
+{
+	return mcwin_keys[mcKeycode-MC_TOGGLE-1][current_os];
+}
 
 void handle_mcwin_key(uint16_t keycode,
     keyrecord_t *record
@@ -128,9 +135,9 @@ void handle_mcwin_key(uint16_t keycode,
     }
     if (keycode > MC_TOGGLE && keycode < MC_END) {
         if (record->event.pressed) {
-            register_code16(mcwin_keys[keycode-MC_TOGGLE-1][current_os]);
+            register_code16(getMcWinKey(keycode));
         } else {
-            unregister_code16(mcwin_keys[keycode-MC_TOGGLE-1][current_os]);
+            unregister_code16(getMcWinKey(keycode));
         }
     }
 }
@@ -162,7 +169,7 @@ void handle_vikey(
 
 layer_state_t layer_state_set_user(layer_state_t state) {
     if (is_alt_tab_active) {
-        unregister_code(KC_LALT);
+        unregister_code16(getMcWinKey(MC_APPTABMOD));
         is_alt_tab_active = false;
     }
     if (is_ctl_tab_active) {
@@ -209,11 +216,11 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         case LSFT(KC_TAB):
             if (record->event.pressed) {
                 if (is_alt_tab_active) {
-                    unregister_code(KC_LALT);
+                    unregister_code16(getMcWinKey(MC_APPTABMOD));
                     is_alt_tab_active = false;
                 }
                 if (is_ctl_tab_active) {
-                    unregister_code(KC_LCTL);
+                    unregister_code16(KC_LCTL);
                     is_ctl_tab_active = false;
                 }
             }
@@ -227,9 +234,9 @@ void post_process_record_user(uint16_t keycode, keyrecord_t *record) {
         case ALT_TAB: // super alt tab macro
         case SFT_ALT_TAB:
             if (record->event.pressed) {
-                if (!is_alt_tab_active) {
+                if (!is_alt_tab_active) {//if this is the first press of the alt tab(app switch) activate the relevant modifier key for the os
                     is_alt_tab_active = true;
-                    register_code(KC_LALT);
+                    register_code16(getMcWinKey(MC_APPTABMOD));
                 }
                 if ((get_mods() & MOD_MASK_SHIFT) || keycode == SFT_ALT_TAB)
                   register_code16(LSFT(KC_TAB));
