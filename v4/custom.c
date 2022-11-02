@@ -23,6 +23,11 @@ enum layers {
 #define L_LT_SYML_F LT(_SYM, KC_F)
 #define R_LT_SYML_U LT(_SYM, KC_U)
 #define L_LT_NUM_G LT(_NUM, KC_G)
+
+#define L_LT_SYML_C LT(_SYM, KC_C)
+#define R_LT_SYML_COMM LT(_SYM, KC_COMM)
+#define L_LT_NUM_X LT(_NUM, KC_X)
+
 #define L_LT_NAV_ENT LT(_VINAV, KC_ENT)
 #define L_LAYER_KEY TD(L_LAYER_DANCE)
 
@@ -377,6 +382,7 @@ bool caps_word_press_user(uint16_t keycode) {
         case KC_QUOT: //å
         case KC_LBRC: //ä
         case KC_SCLN: //ö
+        case KC_SLSH: //;
             add_weak_mods(MOD_BIT(KC_LSFT));  // Apply shift to next key.
             return true;
 
@@ -384,7 +390,6 @@ bool caps_word_press_user(uint16_t keycode) {
         case KC_1 ... KC_0:
         case KC_BSPC:
         case KC_DEL:
-        case KC_UNDS:
             return true;
 
         default:
