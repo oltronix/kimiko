@@ -88,6 +88,7 @@ enum custom_keycodes {          // Make sure have the awesome keycode ready
     MC_CTLZ,
     MC_CTLY,
     MC_APPTABMOD,
+    MC_SNIP,
     MC_END
 };
 //KC_TRNS, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,                                   KC_NO, KC_NO, LSFT(KC_RBRC), KC_NO, KC_NO, KC_NO, 
@@ -95,6 +96,7 @@ enum custom_keycodes {          // Make sure have the awesome keycode ready
 //KC_TRNS, RALT(KC_2), RALT(KC_4), LSFT(KC_2), LSFT(KC_8), LSFT(KC_9),          RALT(KC_MINS), LSFT(KC_7), LSFT(KC_MINS), LSFT(KC_1), RALT(KC_RBRC), KC_NO, 
 //KC_TRNS, KC_NO, RALT(KC_NUBS), LSFT(KC_6), RALT(KC_8), RALT(KC_9), KC_TRNS,   KC_TRNS, LSFT(KC_EQL), KC_EQL, LSFT(KC_5), LSFT(KC_NUHS), KC_NO, KC_TRNS, 
 //KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,                                  KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS),
+// Cmd = GUI, 
 uint16_t mcwin_keys[MC_END-MC_TOGGLE][Mcw_state_count] = {
     [MC_BSLSH-MC_TOGGLE-1] = {RALT(KC_MINS), LSA(KC_7)},
     [MC_LCURL-MC_TOGGLE-1] = {RALT(KC_7), LSA(KC_8)},
@@ -108,6 +110,7 @@ uint16_t mcwin_keys[MC_END-MC_TOGGLE][Mcw_state_count] = {
     [MC_CTLA-MC_TOGGLE-1] = {LCTL(KC_A), LGUI(KC_A)},
     [MC_CTLZ-MC_TOGGLE-1] = {LCTL(KC_Z), LGUI(KC_Z)},
     [MC_CTLY-MC_TOGGLE-1] = {LCTL(KC_Y), SGUI(KC_Z)},
+    [MC_SNIP-MC_TOGGLE-1] = {SGUI(KC_S), LCTL(LSG(KC_4))}, //Take screen snippet into clipboard. Cmd+Ctrl+Shift+4 on mac 
     [MC_APPTABMOD-MC_TOGGLE-1] = {KC_LALT, KC_LGUI}
 };
 
