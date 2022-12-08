@@ -37,7 +37,6 @@ enum layers {
 #define L_NUMP MO(_NUM) //Toggle num pad on right hand
 
 
-
 /* OVERRIDES */
 
 ///const key_override_t delete_key_override = ko_make_basic(MOD_MASK_SHIFT, KC_BSPC, KC_DEL);
@@ -81,6 +80,8 @@ enum custom_keycodes {          // Make sure have the awesome keycode ready
     MC_PIPE,
     MC_WLEFT,
     MC_WRIGHT,
+    MC_HOME,
+    MC_END,
     MC_CTLC,
     MC_CTLX,
     MC_CTLV,
@@ -89,7 +90,7 @@ enum custom_keycodes {          // Make sure have the awesome keycode ready
     MC_CTLY,
     MC_APPTABMOD,
     MC_SNIP,
-    MC_END
+    MC_STOPDEF
 };
 //KC_TRNS, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,                                   KC_NO, KC_NO, LSFT(KC_RBRC), KC_NO, KC_NO, KC_NO, 
 //KC_TRNS, KC_NO, LSFT(KC_3), LSFT(KC_5), RALT(KC_7), RALT(KC_0),               KC_NUBS, LSFT(KC_NUBS), LSFT(KC_0), KC_PPLS, KC_PAST, KC_NO, 
@@ -97,13 +98,15 @@ enum custom_keycodes {          // Make sure have the awesome keycode ready
 //KC_TRNS, KC_NO, RALT(KC_NUBS), LSFT(KC_6), RALT(KC_8), RALT(KC_9), KC_TRNS,   KC_TRNS, LSFT(KC_EQL), KC_EQL, LSFT(KC_5), LSFT(KC_NUHS), KC_NO, KC_TRNS, 
 //KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,                                  KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS),
 // Cmd = GUI, 
-uint16_t mcwin_keys[MC_END-MC_TOGGLE][Mcw_state_count] = {
+uint16_t mcwin_keys[MC_STOPDEF-MC_TOGGLE][Mcw_state_count] = {
     [MC_BSLSH-MC_TOGGLE-1] = {RALT(KC_MINS), LSA(KC_7)},
     [MC_LCURL-MC_TOGGLE-1] = {RALT(KC_7), LSA(KC_8)},
     [MC_RCURL-MC_TOGGLE-1] = {RALT(KC_0), LSA(KC_9)},
     [MC_PIPE-MC_TOGGLE-1] = {RALT(KC_NUBS), RALT(KC_7)},
     [MC_WLEFT-MC_TOGGLE-1] = {LCTL(KC_LEFT), RALT(KC_LEFT)},
     [MC_WRIGHT-MC_TOGGLE-1] = {LCTL(KC_RIGHT), RALT(KC_RIGHT)},
+    [MC_HOME-MC_TOGGLE-1] = {KC_HOME, LGUI(KC_LEFT)},
+    [MC_END-MC_TOGGLE-1] = {KC_END, LGUI(KC_RIGHT)},
     [MC_CTLC-MC_TOGGLE-1] = {LCTL(KC_C), LGUI(KC_C)},
     [MC_CTLX-MC_TOGGLE-1] = {LCTL(KC_X), LGUI(KC_X)},
     [MC_CTLV-MC_TOGGLE-1] = {LCTL(KC_V), LGUI(KC_V)},
@@ -135,13 +138,13 @@ void handle_mcwin_key(uint16_t keycode,
             current_os = Windows;
         return;
     }
-    if (keycode == MC_END && record->event.pressed) {
+    if (keycode == MC_STOPDEF && record->event.pressed) {
         if(current_os == Windows)
             SEND_STRING("Win");
         if(current_os == MacOs)
             SEND_STRING("Mac");
     }
-    if (keycode > MC_TOGGLE && keycode < MC_END) {
+    if (keycode > MC_TOGGLE && keycode < MC_STOPDEF) {
         if (record->event.pressed) {
             register_code16(getMcWinKey(keycode));
         } else {
@@ -373,7 +376,7 @@ bool achordion_chord(uint16_t tap_hold_keycode,
     return true;
   if (tap_hold_keycode == L_LT_NAV_ENT)
     return true;
-      
+
   // Otherwise, follow the opposite hands rule.
   return achordion_opposite_hands(tap_hold_record, other_record);
 }
