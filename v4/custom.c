@@ -90,7 +90,7 @@ enum custom_keycodes {          // Make sure have the awesome keycode ready
     MC_CTLY,
     MC_APPTABMOD,
     MC_SNIP,
-    MC_STOPDEF
+    MC_STOPDEF //this is the end of the list of MC keycodes, it also prints the current value of the toggle with a send string.
 };
 //KC_TRNS, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,                                   KC_NO, KC_NO, LSFT(KC_RBRC), KC_NO, KC_NO, KC_NO, 
 //KC_TRNS, KC_NO, LSFT(KC_3), LSFT(KC_5), RALT(KC_7), RALT(KC_0),               KC_NUBS, LSFT(KC_NUBS), LSFT(KC_0), KC_PPLS, KC_PAST, KC_NO, 
@@ -99,9 +99,9 @@ enum custom_keycodes {          // Make sure have the awesome keycode ready
 //KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,                                  KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS),
 // Cmd = GUI, 
 uint16_t mcwin_keys[MC_STOPDEF-MC_TOGGLE][Mcw_state_count] = {
-    [MC_BSLSH-MC_TOGGLE-1] = {RALT(KC_MINS), LSA(KC_7)},
-    [MC_LCURL-MC_TOGGLE-1] = {RALT(KC_7), LSA(KC_8)},
-    [MC_RCURL-MC_TOGGLE-1] = {RALT(KC_0), LSA(KC_9)},
+    [MC_BSLSH-MC_TOGGLE-1] = {RALT(KC_MINS), RSFT(RALT(KC_7))},
+    [MC_LCURL-MC_TOGGLE-1] = {RALT(KC_7), RSFT(RALT(KC_8))},
+    [MC_RCURL-MC_TOGGLE-1] = {RALT(KC_0), RSFT(RALT(KC_9))},
     [MC_PIPE-MC_TOGGLE-1] = {RALT(KC_NUBS), RALT(KC_7)},
     [MC_WLEFT-MC_TOGGLE-1] = {LCTL(KC_LEFT), RALT(KC_LEFT)},
     [MC_WRIGHT-MC_TOGGLE-1] = {LCTL(KC_RIGHT), RALT(KC_RIGHT)},
