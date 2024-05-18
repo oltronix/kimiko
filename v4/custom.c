@@ -315,7 +315,7 @@ static td_tap_t lltap_state = {
     .state = TD_NONE
 };
 
-void ll_finished(qk_tap_dance_state_t *state, void *user_data) {
+void ll_finished(tap_dance_state_t *state, void *user_data) {
     lltap_state.state = hold_me(state);
     switch (lltap_state.state) {
         case TD_SINGLE_HOLD: layer_on(_WINNAV); break;
@@ -325,7 +325,7 @@ void ll_finished(qk_tap_dance_state_t *state, void *user_data) {
     }
 }
 
-void ll_reset(qk_tap_dance_state_t *state, void *user_data) {
+void ll_reset(tap_dance_state_t *state, void *user_data) {
     switch (lltap_state.state) {
         case TD_SINGLE_HOLD: layer_off(_WINNAV); break;
         case TD_DOUBLE_HOLD: layer_off(_SELECT); break;
@@ -336,7 +336,7 @@ void ll_reset(qk_tap_dance_state_t *state, void *user_data) {
 }
 
 // Associate our tap dance key with its functionality
-qk_tap_dance_action_t tap_dance_actions[] = {
+tap_dance_action_t tap_dance_actions[] = {
     [L_LAYER_DANCE] = ACTION_TAP_DANCE_FN_ADVANCED(NULL, ll_finished, ll_reset)
 };
 

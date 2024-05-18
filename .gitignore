@@ -3,3 +3,4 @@
 **/build/
 *.hex
 *.bak
+.DS_Store
