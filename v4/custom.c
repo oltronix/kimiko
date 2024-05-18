@@ -47,7 +47,7 @@ enum layers {
 //    NULL // Null terminate the array of overrides!
 //};
 
-uint16_t alt_tab_registered;
+uint16_t pwtab_key_registered = 0;
 bool is_alt_tab_active = false;
 bool is_ctl_tab_active = false;
 
@@ -64,8 +64,6 @@ enum custom_keycodes {          // Make sure have the awesome keycode ready
   ATAB_RIGHT,
   ATAB_UP,
   ATAB_DOWN,
-  CTL_TAB,
-  SFT_CTL_TAB,
   CTAB_LEFT,
   CTAB_RIGHT,
 // Custom oneshot mod implementation with no timers.
@@ -233,54 +231,64 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
 void send_tab_key(uint16_t key) 
 {
-    register_code(key);
-    alt_tab_registered = key;//We need to unregister this keypress again later.
+    register_code16(key);
+    pwtab_key_registered = key;//We need to unregister this keypress again later.
+}
+
+void handle_alttab_press(uint16_t keycode) 
+{
+    if (!is_alt_tab_active) {//if this is the first press of the alt tab(app switch)
+        is_alt_tab_active = true;
+        register_code16(getMcWinKey(MC_APPTABMOD));// activate the relevant modifier key for the os
+        send_tab_key(KC_TAB);// press tab once to open the menu for the OS.
+        return;
+    }
+    if (keycode == ALT_TAB) 
+        send_tab_key(KC_TAB);
+    else if (keycode == SFT_ALT_TAB) 
+        send_tab_key(KC_LSFT);
+    else if (keycode == ATAB_LEFT)
+        send_tab_key(KC_LEFT);
+    else if (keycode == ATAB_RIGHT)
+        send_tab_key(KC_RIGHT);
+    else if (keycode == ATAB_DOWN)
+        send_tab_key(KC_DOWN);
+    else if (keycode == ATAB_UP)
+        send_tab_key(KC_UP);
+}
+
+void handle_ctltab_press(uint16_t keycode) 
+{
+    if (!is_ctl_tab_active) {//if this is the first press of the alt tab(app switch)
+        is_ctl_tab_active = true;
+        register_code(KC_LCTL);// activate the relevant modifier key for the os
+        send_tab_key(KC_TAB);// press tab once to open the menu for the OS.
+        return;
+    }
+    if (keycode == CTAB_RIGHT)
+        send_tab_key(KC_TAB);
+    else if (keycode == CTAB_LEFT)
+        send_tab_key(LSFT(KC_TAB));
 }
 
 void handle_app_switching(uint16_t keycode, keyrecord_t *record) {
-    if (record->event.pressed && (keycode >= ALT_TAB || keycode <= ATAB_DOWN))
+    if (record->event.pressed)
     {
-        if (!is_alt_tab_active) {//if this is the first press of the alt tab(app switch)
-            is_alt_tab_active = true;
-            register_code16(getMcWinKey(MC_APPTABMOD));// activate the relevant modifier key for the os
-            send_tab_key(KC_TAB);// press tab once to open the menu for the OS.
-            return;
-        }
-        if (keycode == ALT_TAB) 
-            send_tab_key(KC_TAB);
-        else if (keycode == SFT_ALT_TAB) 
-            send_tab_key(KC_LSFT);
-        else if (keycode == ATAB_LEFT)
-            send_tab_key(KC_LEFT);
-        else if (keycode == ATAB_RIGHT)
-            send_tab_key(KC_RIGHT);
-        else if (keycode == ATAB_DOWN)
-            send_tab_key(KC_DOWN);
-        else if (keycode == ATAB_UP)
-            send_tab_key(KC_UP);
-    } else {
-        unregister_code(alt_tab_registered);
+        if (keycode >= ALT_TAB && keycode <= ATAB_DOWN)
+            handle_alttab_press(keycode);
+        else if (keycode == CTAB_LEFT || keycode == CTAB_RIGHT)
+            handle_ctltab_press(keycode);
+    }
+    else if (pwtab_key_registered != 0)
+    {
+        unregister_code16(pwtab_key_registered);
+        pwtab_key_registered = 0;
     }
 }
 
 void post_process_record_user(uint16_t keycode, keyrecord_t *record) {
     handle_app_switching(keycode, record);
-    switch (keycode){
-        case CTL_TAB: // super alt tab macro
-        case SFT_CTL_TAB:
-            if (record->event.pressed) {
-                if (!is_ctl_tab_active) {
-                    is_ctl_tab_active = true;
-                    register_code(KC_LCTL);
-                }
-                if ((get_mods() & MOD_MASK_SHIFT) || keycode == SFT_CTL_TAB)
-                  register_code16(LSFT(KC_TAB));
-                else
-                  register_code(KC_TAB);
-            } else {
-                unregister_code(KC_TAB);
-            }
-            break;
+    switch (keycode){ 
         case VTOGGLE:
             if (record->event.pressed) {
                 vi_mode_active = !vi_mode_active;
@@ -288,8 +296,6 @@ void post_process_record_user(uint16_t keycode, keyrecord_t *record) {
             break;
     }
 }
-
-
 
 bool is_oneshot_cancel_key(uint16_t keycode) {
     switch (keycode) {
