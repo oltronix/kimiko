@@ -55,7 +55,7 @@ enum {
     Windows,
     MacOs,
     Mcw_state_count
-} current_os = Windows;
+} current_os = MacOs;
 
 enum custom_keycodes {          // Make sure have the awesome keycode ready
   ALT_TAB = SAFE_RANGE,
@@ -222,21 +222,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     handle_vikey(keycode, vi_mode_active, VIRIGHT, KC_RIGHT, KC_L, record);
     handle_mcwin_key(keycode, record);
 
-    switch (keycode){
-        case KC_TAB:
-        case LSFT(KC_TAB):
-            if (record->event.pressed) {
-                if (is_alt_tab_active) {
-                    unregister_code16(getMcWinKey(MC_APPTABMOD));
-                    is_alt_tab_active = false;
-                }
-                if (is_ctl_tab_active) {
-                    unregister_code16(KC_LCTL);
-                    is_ctl_tab_active = false;
-                }
-            }
-            break;
-    }
     return true;
 }
 
