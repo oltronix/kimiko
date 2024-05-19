@@ -191,6 +191,7 @@ layer_state_t layer_state_set_user(layer_state_t state) {
         unregister_code(KC_LCTL);
         is_ctl_tab_active = false;
     }
+    pwtab_key_registered = 0;
     return update_tri_layer_state(state, _WINNAV, _VINAV, _CONF);
     return state;
 }
@@ -237,7 +238,7 @@ void send_tab_key(uint16_t key)
 
 void handle_alttab_press(uint16_t keycode) 
 {
-    if (!is_alt_tab_active) {//if this is the first press of the alt tab(app switch)
+    if (!is_alt_tab_active && !(keycode == ATAB_LEFT || keycode == ATAB_RIGHT)) {//if this is the first press of the alt tab(app switch)
         is_alt_tab_active = true;
         register_code16(getMcWinKey(MC_APPTABMOD));// activate the relevant modifier key for the os
         send_tab_key(KC_TAB);// press tab once to open the menu for the OS.
@@ -247,10 +248,16 @@ void handle_alttab_press(uint16_t keycode)
         send_tab_key(KC_TAB);
     else if (keycode == SFT_ALT_TAB) 
         send_tab_key(KC_LSFT);
-    else if (keycode == ATAB_LEFT)
-        send_tab_key(KC_LEFT);
+    else if (keycode == ATAB_LEFT) // We are going to hijack this button for window tap
+        if (is_alt_tab_active)
+            send_tab_key(KC_LEFT);
+        else 
+            send_tab_key(LGUI(KC_NUBS));
     else if (keycode == ATAB_RIGHT)
-        send_tab_key(KC_RIGHT);
+        if (is_alt_tab_active)
+            send_tab_key(KC_RIGHT);
+        else 
+            send_tab_key(LSFT(LGUI(KC_NUBS)));
     else if (keycode == ATAB_DOWN)
         send_tab_key(KC_DOWN);
     else if (keycode == ATAB_UP)

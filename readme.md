@@ -1,3 +1,10 @@
+# Keymap
+
+## Super cool power tabbing
+I have placed a hold layer on my enter button, if I activate that layer I and press one ATAB_DOWN or ATAB_UP it acts as pressing alt tab, the FRST buttons then act as navigation in the alt-tab window until the layer is released.
+If I instead press the CTAB_LEFT or CTAB_RIGHT key it will tab through tabs in the current application until the layer is released.
+Finally I have added a hacky special case that sends the MAC command for switching window for the current app on ATAB_LEFT or ATAB_RIGHT if the alt tab window isn't already open.
+
 # Build
 I'm using a janky build script that copies a qmk configurator JSON and all the C code into a qmk docker image.
 
