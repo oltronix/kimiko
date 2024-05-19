@@ -5,6 +5,14 @@ I have placed a hold layer on my enter button, if I activate that layer I and pr
 If I instead press the CTAB_LEFT or CTAB_RIGHT key it will tab through tabs in the current application until the layer is released.
 Finally I have added a hacky special case that sends the MAC command for switching window for the current app on ATAB_LEFT or ATAB_RIGHT if the alt tab window isn't already open.
 
+## Window management
+I have tried adding enough keys for both win and mac to be able to manage windows without the mouse, but some options have no default shortcut and needs to be added.
+### Mac
+ Maximize window: Window->Zoom : CTL-CMD-Z
+ Move Left: Move Window to Left Side of Screen : CTL-CMD-ALT-Left 
+ Move Right: Move Window to Right Side of Screen : ⌃⌥⌘R
+ 
+
 # Build
 I'm using a janky build script that copies a qmk configurator JSON and all the C code into a qmk docker image.
 

@@ -94,6 +94,12 @@ enum custom_keycodes {          // Make sure have the awesome keycode ready
     MC_CTLY,
     MC_APPTABMOD,
     MC_SNIP,
+    MC_LOCKSCREEN,
+    MC_WINDOWMAX,
+    MC_WINDOWMIN,
+    MC_WINDOWLEFT,
+    MC_WINDOWRIGHT,
+    MC_WINDOWCLOSE,
     MC_STOPDEF //this is the end of the list of MC keycodes, it also prints the current value of the toggle with a send string.
 };
 //KC_TRNS, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,                                   KC_NO, KC_NO, LSFT(KC_RBRC), KC_NO, KC_NO, KC_NO, 
@@ -117,7 +123,13 @@ uint16_t mcwin_keys[MC_STOPDEF-MC_TOGGLE][Mcw_state_count] = {
     [MC_CTLA-MC_TOGGLE-1] = {LCTL(KC_A), LGUI(KC_A)},
     [MC_CTLZ-MC_TOGGLE-1] = {LCTL(KC_Z), LGUI(KC_Z)},
     [MC_CTLY-MC_TOGGLE-1] = {LCTL(KC_Y), SGUI(KC_Z)},
-    [MC_SNIP-MC_TOGGLE-1] = {SGUI(KC_S), LCTL(LSG(KC_4))}, //Take screen snippet into clipboard. Cmd+Ctrl+Shift+4 on mac 
+    [MC_SNIP-MC_TOGGLE-1] = {SGUI(KC_S), LCTL(LSG(KC_4))}, //Take screen snippet into clipboard. Cmd+Ctrl+Shift+4 on mac
+    [MC_LOCKSCREEN-MC_TOGGLE-1] = {LGUI(KC_L), LCTL(LGUI(KC_Q))}, //Lock screen GUI+L on Win GUI+CTL+Q mac
+    [MC_WINDOWMAX-MC_TOGGLE-1] = {LGUI(KC_UP), LCTL(LGUI(KC_Z))}, //Maximize window GUI+UP on Win GUI+CTL+Z mac
+    [MC_WINDOWMIN-MC_TOGGLE-1] = {LGUI(KC_DOWN), LGUI(KC_M)}, //Close window GUI+down on Win GUI+M mac
+    [MC_WINDOWLEFT-MC_TOGGLE-1] = {LGUI(KC_LEFT), RALT(LCTL(LGUI(KC_L)))}, //Move window left GUI+Left on Win custom GUI+CTL+ALT+L mac
+    [MC_WINDOWRIGHT-MC_TOGGLE-1] = {LGUI(KC_RIGHT), RALT(LCTL(LGUI(KC_R)))}, //Move window right GUI+R on Win custom GUI+CTL+ALT+R mac
+    [MC_WINDOWCLOSE-MC_TOGGLE-1] = {LGUI(KC_W), LGUI(KC_W)}, //Close window GUI+W on Win GUI+W mac
     [MC_APPTABMOD-MC_TOGGLE-1] = {KC_LALT, KC_LGUI} //key used as a modifier to have tab act as application switcher
 };
 
