@@ -21,5 +21,5 @@ typedef struct {
 } td_tap_t;
 
 
-td_state_t hold_me(qk_tap_dance_state_t *state);
+td_state_t hold_me(tap_dance_state_t *state);
 
