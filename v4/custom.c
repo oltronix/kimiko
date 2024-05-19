@@ -262,8 +262,6 @@ void handle_ctltab_press(uint16_t keycode)
     if (!is_ctl_tab_active) {//if this is the first press of the alt tab(app switch)
         is_ctl_tab_active = true;
         register_code(KC_LCTL);// activate the relevant modifier key for the os
-        send_tab_key(KC_TAB);// press tab once to open the menu for the OS.
-        return;
     }
     if (keycode == CTAB_RIGHT)
         send_tab_key(KC_TAB);
