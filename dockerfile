@@ -2,7 +2,7 @@ FROM qmkfm/qmk_cli
 WORKDIR /qmk
 
 # Setup QMK firmware (repository can be overridden via build arg)
-ARG QMK_REPO=qmk/qmk_firmware
+ARG QMK_REPO=oltronix/qmk_firmware
 ARG QMK_CACHE_BUST=1
 RUN qmk setup ${QMK_REPO} --yes -H /qmk/qmk_firmware/ \
     && pip install -r /qmk/qmk_firmware/requirements.txt
