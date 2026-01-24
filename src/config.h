@@ -31,7 +31,7 @@
 // #define MASTER_RIGHT
 // #define EE_HANDS
 
-#define OLED_FONT_H "glcdfont.c"
+#define OLED_FONT_H "keyboards/keycapsss/kimiko/rev2/glcdfont.c"
 //#define OLED_FONT_WIDTH 5
 //#define OLED_FONT_HEIGHT 7
 
