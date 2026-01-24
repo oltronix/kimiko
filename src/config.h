@@ -31,8 +31,7 @@
 // #define MASTER_RIGHT
 // #define EE_HANDS
 
-// Use default QMK font (Kimiko default keymap no longer includes custom font)
-// #define OLED_FONT_H "keyboards/keycapsss/kimiko/keymaps/default/glcdfont.c"
+#define OLED_FONT_H "glcdfont.c"
 //#define OLED_FONT_WIDTH 5
 //#define OLED_FONT_HEIGHT 7
 
