@@ -1,4 +1,5 @@
 #include QMK_KEYBOARD_H
+#include "transactions.h"
 
 #include "oneshot.h"
 #include "swapper.h"
@@ -102,12 +103,12 @@ enum custom_keycodes {          // Make sure have the awesome keycode ready
     MC_WINDOWCLOSE,
     MC_STOPDEF //this is the end of the list of MC keycodes, it also prints the current value of the toggle with a send string.
 };
-//KC_TRNS, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,                                   KC_NO, KC_NO, LSFT(KC_RBRC), KC_NO, KC_NO, KC_NO, 
-//KC_TRNS, KC_NO, LSFT(KC_3), LSFT(KC_5), RALT(KC_7), RALT(KC_0),               KC_NUBS, LSFT(KC_NUBS), LSFT(KC_0), KC_PPLS, KC_PAST, KC_NO, 
-//KC_TRNS, RALT(KC_2), RALT(KC_4), LSFT(KC_2), LSFT(KC_8), LSFT(KC_9),          RALT(KC_MINS), LSFT(KC_7), LSFT(KC_MINS), LSFT(KC_1), RALT(KC_RBRC), KC_NO, 
-//KC_TRNS, KC_NO, RALT(KC_NUBS), LSFT(KC_6), RALT(KC_8), RALT(KC_9), KC_TRNS,   KC_TRNS, LSFT(KC_EQL), KC_EQL, LSFT(KC_5), LSFT(KC_NUHS), KC_NO, KC_TRNS, 
+//KC_TRNS, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,                                   KC_NO, KC_NO, LSFT(KC_RBRC), KC_NO, KC_NO, KC_NO,
+//KC_TRNS, KC_NO, LSFT(KC_3), LSFT(KC_5), RALT(KC_7), RALT(KC_0),               KC_NUBS, LSFT(KC_NUBS), LSFT(KC_0), KC_PPLS, KC_PAST, KC_NO,
+//KC_TRNS, RALT(KC_2), RALT(KC_4), LSFT(KC_2), LSFT(KC_8), LSFT(KC_9),          RALT(KC_MINS), LSFT(KC_7), LSFT(KC_MINS), LSFT(KC_1), RALT(KC_RBRC), KC_NO,
+//KC_TRNS, KC_NO, RALT(KC_NUBS), LSFT(KC_6), RALT(KC_8), RALT(KC_9), KC_TRNS,   KC_TRNS, LSFT(KC_EQL), KC_EQL, LSFT(KC_5), LSFT(KC_NUHS), KC_NO, KC_TRNS,
 //KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS,                                  KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS, KC_TRNS),
-// Cmd = GUI, 
+// Cmd = GUI,
 uint16_t mcwin_keys[MC_STOPDEF-MC_TOGGLE][Mcw_state_count] = {
     [MC_BSLSH-MC_TOGGLE-1] = {RALT(KC_MINS), RSFT(RALT(KC_7))},
     [MC_LCURL-MC_TOGGLE-1] = {RALT(KC_7), RSFT(RALT(KC_8))},
@@ -139,7 +140,7 @@ enum {
     SOME_OTHER_DANCE
 };
 
-uint16_t getMcWinKey(uint16_t mcKeycode) 
+uint16_t getMcWinKey(uint16_t mcKeycode)
 {
 	return mcwin_keys[mcKeycode-MC_TOGGLE-1][current_os];
 }
@@ -242,13 +243,13 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     return true;
 }
 
-void send_tab_key(uint16_t key) 
+void send_tab_key(uint16_t key)
 {
     register_code16(key);
     pwtab_key_registered = key;//We need to unregister this keypress again later.
 }
 
-void handle_alttab_press(uint16_t keycode) 
+void handle_alttab_press(uint16_t keycode)
 {
     if (!is_alt_tab_active && !(keycode == ATAB_LEFT || keycode == ATAB_RIGHT)) {//if this is the first press of the alt tab(app switch)
         is_alt_tab_active = true;
@@ -256,19 +257,19 @@ void handle_alttab_press(uint16_t keycode)
         send_tab_key(KC_TAB);// press tab once to open the menu for the OS.
         return;
     }
-    if (keycode == ALT_TAB) 
+    if (keycode == ALT_TAB)
         send_tab_key(KC_TAB);
-    else if (keycode == SFT_ALT_TAB) 
+    else if (keycode == SFT_ALT_TAB)
         send_tab_key(KC_LSFT);
     else if (keycode == ATAB_LEFT) // We are going to hijack this button for window tap
         if (is_alt_tab_active)
             send_tab_key(KC_LEFT);
-        else 
+        else
             send_tab_key(LGUI(KC_NUBS));
     else if (keycode == ATAB_RIGHT)
         if (is_alt_tab_active)
             send_tab_key(KC_RIGHT);
-        else 
+        else
             send_tab_key(LSFT(LGUI(KC_NUBS)));
     else if (keycode == ATAB_DOWN)
         send_tab_key(KC_DOWN);
@@ -276,7 +277,7 @@ void handle_alttab_press(uint16_t keycode)
         send_tab_key(KC_UP);
 }
 
-void handle_ctltab_press(uint16_t keycode) 
+void handle_ctltab_press(uint16_t keycode)
 {
     if (!is_ctl_tab_active) {//if this is the first press of the alt tab(app switch)
         is_ctl_tab_active = true;
@@ -305,7 +306,7 @@ void handle_app_switching(uint16_t keycode, keyrecord_t *record) {
 
 void post_process_record_user(uint16_t keycode, keyrecord_t *record) {
     handle_app_switching(keycode, record);
-    switch (keycode){ 
+    switch (keycode){
         case VTOGGLE:
             if (record->event.pressed) {
                 vi_mode_active = !vi_mode_active;
@@ -399,11 +400,40 @@ void matrix_scan_user(void) {
   achordion_task();
 }
 
+// Split keyboard sync for OS state
+typedef struct _os_sync_t {
+    uint8_t os_state;
+} os_sync_t;
+
+void os_sync_slave_handler(uint8_t in_buflen, const void* in_data, uint8_t out_buflen, void* out_data) {
+    const os_sync_t *m2s = (const os_sync_t*)in_data;
+    current_os = m2s->os_state;
+}
+
+void keyboard_post_init_user(void) {
+    transaction_register_rpc(USER_SYNC_OS, os_sync_slave_handler);
+}
+
+void housekeeping_task_user(void) {
+    if (is_keyboard_master()) {
+        static uint32_t last_sync = 0;
+        static uint8_t last_os = 0xFF;
+        // Only sync when OS state changes or every 1000ms
+        if (current_os != last_os || timer_elapsed32(last_sync) > 1000) {
+            os_sync_t m2s = { .os_state = current_os };
+            if (transaction_rpc_send(USER_SYNC_OS, sizeof(m2s), &m2s)) {
+                last_sync = timer_read32();
+                last_os = current_os;
+            }
+        }
+    }
+}
+
 bool achordion_chord(uint16_t tap_hold_keycode,
                      keyrecord_t* tap_hold_record,
                      uint16_t other_keycode,
                      keyrecord_t* other_record) {
-  
+
   if (other_keycode == LSFT_T(KC_ENT) || other_keycode == RSFT_T(KC_ESC))
     return true;
   if (tap_hold_keycode == L_LT_NAV_ENT)
@@ -618,6 +648,14 @@ void render_layer_state(void) {
     }
 }
 
+void render_os_status(void) {
+    if (current_os == Windows) {
+        oled_write_P(PSTR(" Win "), false);
+    } else {
+        oled_write_P(PSTR(" Mac "), false);
+    }
+}
+
 void render_status_main(void) {
     render_space();
     render_space();
@@ -627,6 +665,8 @@ void render_status_main(void) {
     render_space();
     render_mod_status_gui_alt(get_mods()|get_oneshot_mods());
     render_mod_status_ctrl_shift(get_mods()|get_oneshot_mods());
+    render_space();
+    render_os_status();
 }
 
 void render_status_secondary(void) {
@@ -634,6 +674,7 @@ void render_status_secondary(void) {
     render_space();
     render_logo();
     render_space();
+    render_os_status();
 }
 
 bool oled_task_user(void) {
