@@ -1,3 +1,6 @@
+# Kimiko uses Pro Micro footprint - required for converter support
+PIN_COMPATIBLE = promicro
+
 OLED_ENABLE = yes
 OLED_DRIVER = ssd1306   # Enables the use of OLED displays
 # ENCODER_ENABLE = yes       # ENables the use of one or more encoders
@@ -8,7 +11,7 @@ RGBLIGHT_ENABLE = no      # Enable keyboard RGB underglow
 # This does not affect QMK Macros and Layers
 LTO_ENABLE = yes
 
-KEY_OVERRIDE_ENABLE = yes
+KEY_OVERRIDE_ENABLE = no
 TAP_DANCE_ENABLE = yes
 CAPS_WORD_ENABLE = yes
 DYNAMIC_TAPPING_TERM_ENABLE = yes
@@ -16,4 +19,3 @@ DYNAMIC_TAPPING_TERM_ENABLE = yes
 SRC += oneshot.c
 SRC += tapdance.c
 SRC += achordion.c
-
