@@ -1,6 +1,7 @@
 
 **/pub/
 **/build/
+**/output/
 *.hex
 *.bak
 .DS_Store
