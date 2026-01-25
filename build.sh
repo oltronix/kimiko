@@ -6,6 +6,7 @@ KEYBOARD="${KEYBOARD:-keycapsss/kimiko/rev1}"
 KEYMAP="${KEYMAP:-kimiko}"
 CONVERT_TO="${CONVERT_TO:-helios}"
 QMK_FIRMWARE="${QMK_FIRMWARE:-../qmk_firmware}"
+QMK_BRANCH="${QMK_BRANCH:-master}"
 
 # Resolve script directory for reliable paths
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -16,6 +17,7 @@ echo "=== QMK Kimiko Build ==="
 echo "Keyboard: ${KEYBOARD}"
 echo "Keymap: ${KEYMAP}"
 echo "Convert to: ${CONVERT_TO}"
+echo "QMK Branch: ${QMK_BRANCH}"
 
 # Validate required files exist
 if [[ ! -f "${SCRIPT_DIR}/keymap.json" ]]; then
@@ -65,11 +67,31 @@ echo "Compiling firmware..."
 cd "${QMK_FIRMWARE}"
 qmk compile -e CONVERT_TO="${CONVERT_TO}" -km "${KEYMAP}" -kb "${KEYBOARD}" -c
 
-# Step 6: Copy output firmware
+# Step 6: Copy output firmware with branch suffix
 echo "Copying firmware to output directory..."
 cd "${SCRIPT_DIR}"
-find "${QMK_FIRMWARE}" -maxdepth 1 -name "*.uf2" -exec cp {} "${OUTPUT_DIR}/" \;
-find "${QMK_FIRMWARE}" -maxdepth 1 -name "*.hex" -exec cp {} "${OUTPUT_DIR}/" \;
+
+# Add branch name to firmware filename (replace master with nothing for cleaner default names)
+BRANCH_SUFFIX=""
+if [[ "${QMK_BRANCH}" != "master" ]]; then
+    BRANCH_SUFFIX="_${QMK_BRANCH}"
+fi
+
+for f in "${QMK_FIRMWARE}"/*.uf2; do
+    if [[ -f "$f" ]]; then
+        basename="${f##*/}"
+        newname="${basename%.uf2}${BRANCH_SUFFIX}.uf2"
+        cp "$f" "${OUTPUT_DIR}/${newname}"
+    fi
+done
+
+for f in "${QMK_FIRMWARE}"/*.hex; do
+    if [[ -f "$f" ]]; then
+        basename="${f##*/}"
+        newname="${basename%.hex}${BRANCH_SUFFIX}.hex"
+        cp "$f" "${OUTPUT_DIR}/${newname}"
+    fi
+done
 
 # List outputs
 echo "=== Build complete ==="

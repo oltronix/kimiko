@@ -54,6 +54,43 @@ Shell into the container for debugging:
 docker run -it --rm --entrypoint /bin/bash -v $(pwd):/qmk/keymap kimiko-build
 ```
 
+## ESD Damage Workaround
+
+One of the keyboard halves has an MCU with an ESD-damaged pin. The row pin `B5` is dead, so the firmware for that half uses encoder pin `F4` instead.
+
+This fix lives in a separate branch of the [QMK fork](https://github.com/oltronix/qmk_firmware/tree/esd-fix) and requires building a separate Docker image.
+
+### Building Both Firmware Versions
+
+**Regular firmware** (for the working MCU):
+```bash
+docker build -t kimiko-build .
+docker run -v $(pwd):/qmk/keymap kimiko-build
+```
+Output: `output/keycapsss_kimiko_rev1_kimiko_helios.uf2`
+
+**ESD workaround firmware** (for the damaged MCU):
+```bash
+docker build --build-arg QMK_BRANCH=esd-fix -t kimiko-build-esd .
+docker run -v $(pwd):/qmk/keymap kimiko-build-esd
+```
+Output: `output/keycapsss_kimiko_rev1_kimiko_helios_esd-fix.uf2`
+
+The branch name is automatically appended to the firmware filename to prevent overwriting.
+
+### What the ESD Fix Changes
+
+In `keyboards/keycapsss/kimiko/rev1/keyboard.json`, the matrix row pins are changed from:
+```json
+"rows": ["C6", "D7", "E6", "B4", "B5"]
+```
+to:
+```json
+"rows": ["C6", "D7", "E6", "B4", "F4"]
+```
+
+This sacrifices the rotary encoder on that half but restores full keyboard functionality.
+
 ## Features
 
 ### OS Toggle (Mac/Windows)
@@ -72,7 +109,7 @@ Keys for managing windows on both Mac and Windows:
 - Lock screen, screenshot
 
 **Mac shortcuts that need manual setup:**
-- Maximize: Window → Zoom: `Ctrl+Cmd+Z`
+- Maximize: Window -> Zoom: `Ctrl+Cmd+Z`
 - Move Left: `Ctrl+Cmd+Alt+L`
 - Move Right: `Ctrl+Cmd+Alt+R`
 
