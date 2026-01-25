@@ -31,7 +31,10 @@
 // #define MASTER_RIGHT
 // #define EE_HANDS
 
-#define OLED_FONT_H "keyboards/keycapsss/kimiko/keymaps/default/glcdfont.c"
+// Split keyboard data sync for OS state
+#define SPLIT_TRANSACTION_IDS_USER USER_SYNC_OS
+
+#define OLED_FONT_H "keyboards/keycapsss/kimiko/rev2/glcdfont.c"
 //#define OLED_FONT_WIDTH 5
 //#define OLED_FONT_HEIGHT 7
 

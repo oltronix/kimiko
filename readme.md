@@ -1,56 +1,141 @@
-# Keymap
+# Kimiko Keyboard Configuration
 
-## Super cool power tabbing
-I have placed a hold layer on my enter button, if I activate that layer I and press one ATAB_DOWN or ATAB_UP it acts as pressing alt tab, the FRST buttons then act as navigation in the alt-tab window until the layer is released.
-If I instead press the CTAB_LEFT or CTAB_RIGHT key it will tab through tabs in the current application until the layer is released.
-Finally I have added a hacky special case that sends the MAC command for switching window for the current app on ATAB_LEFT or ATAB_RIGHT if the alt tab window isn't already open.
+Custom QMK keymap for the [Keycapsss Kimiko](https://keycapsss.com) split keyboard with Helios controllers.
 
-## Window management
-I have tried adding enough keys for both win and mac to be able to manage windows without the mouse, but some options have no default shortcut and needs to be added.
-### Mac
- Maximize window: Window->Zoom : CTL-CMD-Z
- Move Left: Move Window to Left Side of Screen : CTL-CMD-ALT-Left 
- Move Right: Move Window to Right Side of Screen : ⌃⌥⌘R
- 
+## Build Instructions
 
-# Build
-I'm using a janky build script that copies a qmk configurator JSON and all the C code into a qmk docker image.
+### Prerequisites
+- Docker installed and running
 
-## Green path
-Build the dockerfile from the v4 folder, crating a image with the tag kimiko:
-`docker build . -t kimiko`
-This will take some time since the qmk_cli image is humogeous.
-Then run the latest build of the image:
-    -v:  with the v4 folder mounted as qmk/v4
-    -it: print the console output into the terminal
-    --rm: remove the container after the run is finished
-`docker run -it --rm -v /Users/androlau651/code/_hob/kimiko/v4:/qmk/v4 kimiko:latest`
-The build.sh script will build a final keymap from the mounted files.
-It compiles the keymap.json file into a C keymap which I extract only the keycode matrix from.
-That key matrix is appended to the custom.c which is the final keymap.
-The keymap along with all dependencies in the /src folder will then be copied into the qmk_firmware folder as a kimiko keymap that we can compile.
-After the compile is done the resulting firmware will be copied to the host system to a /map folder.
+### Building the Firmware
 
-## Debug
-This can and has broken at several points in time so I have included some commands for debugging the build.
-Shell in the kimiko container:
-`docker run -it --rm --entrypoint /bin/bash -v /Users/androlau651/code/_hob/kimiko/v4:/qmk/v4 kimiko:latest`
+1. **Build the Docker image** (first time or after QMK updates):
+   ```bash
+   docker build -t kimiko-build .
+   ```
 
-### It is good to
-Update the fork repo now and then...
-https://github.com/oltronix/qmk_firmware/
+2. **Compile the firmware**:
+   ```bash
+   docker run -v $(pwd):/qmk/keymap kimiko-build
+   ```
 
-The image is built with a personal fork of the qmk_firmware, I don't know why I have a fork since I have everything custom in this repo but that is where I'm at right now, so not updating the firmware does mean I miss out on new features and bug fixes and lovely breaking changes.
+3. **Flash**: Copy `output/keycapsss_kimiko_rev1_kimiko_helios.uf2` to your keyboard in bootloader mode.
 
-This is the line in the dockerfile that sets up the fork.
-`RUN qmk setup oltronix/qmk_firmware --yes -H /qmk/qmk_firmware/`
+### Refreshing QMK Firmware
 
-### Manually try to compile the firmware
-This assumes you are in the kimiko keymaps folder in qmk_firmware
-```
-cp -r /qmk/v4/pub/. v4/
-qmk compile -km v4 -c
-qmk config user.keyboard=keycapsss/kimiko
-qmk compile -km v4 -kb keycapsss/kimiko/rev1 -c
+To pick up upstream QMK changes, rebuild with cache busting:
+```bash
+docker build --build-arg QMK_CACHE_BUST=$(date +%s) -t kimiko-build .
 ```
 
+### Clean Build
+
+If you encounter build issues, clear the build directories:
+```bash
+rm -rf build/ output/
+docker run -v $(pwd):/qmk/keymap kimiko-build
+```
+
+### Configuration
+
+The build can be customized via environment variables:
+```bash
+docker run -v $(pwd):/qmk/keymap \
+  -e KEYBOARD=keycapsss/kimiko/rev1 \
+  -e KEYMAP=kimiko \
+  -e CONVERT_TO=helios \
+  kimiko-build
+```
+
+### Debugging
+
+Shell into the container for debugging:
+```bash
+docker run -it --rm --entrypoint /bin/bash -v $(pwd):/qmk/keymap kimiko-build
+```
+
+## ESD Damage Workaround
+
+One of the keyboard halves has an MCU with an ESD-damaged pin. The row pin `B5` is dead, so the firmware for that half uses encoder pin `F4` instead.
+
+This fix lives in a separate branch of the [QMK fork](https://github.com/oltronix/qmk_firmware/tree/esd-fix) and requires building a separate Docker image.
+
+### Building Both Firmware Versions
+
+**Regular firmware** (for the working MCU):
+```bash
+docker build -t kimiko-build .
+docker run -v $(pwd):/qmk/keymap kimiko-build
+```
+Output: `output/keycapsss_kimiko_rev1_kimiko_helios.uf2`
+
+**ESD workaround firmware** (for the damaged MCU):
+```bash
+docker build --build-arg QMK_BRANCH=esd-fix -t kimiko-build-esd .
+docker run -v $(pwd):/qmk/keymap kimiko-build-esd
+```
+Output: `output/keycapsss_kimiko_rev1_kimiko_helios_esd-fix.uf2`
+
+The branch name is automatically appended to the firmware filename to prevent overwriting.
+
+### What the ESD Fix Changes
+
+In `keyboards/keycapsss/kimiko/rev1/keyboard.json`, the matrix row pins are changed from:
+```json
+"rows": ["C6", "D7", "E6", "B4", "B5"]
+```
+to:
+```json
+"rows": ["C6", "D7", "E6", "B4", "F4"]
+```
+
+This sacrifices the rotary encoder on that half but restores full keyboard functionality.
+
+## Features
+
+### OS Toggle (Mac/Windows)
+Toggle between Mac and Windows key mappings with `MC_TOGGLE`. The current OS is displayed on the secondary OLED. Key combinations like copy/paste automatically use the correct modifier (Cmd on Mac, Ctrl on Windows).
+
+### Power Tabbing
+Hold the layer key on enter to activate navigation mode:
+- `ATAB_DOWN`/`ATAB_UP`: Alt-Tab application switching
+- Arrow keys navigate within the Alt-Tab window
+- `CTAB_LEFT`/`CTAB_RIGHT`: Tab switching within current application
+- `ATAB_LEFT`/`ATAB_RIGHT`: Mac window switching (when Alt-Tab not active)
+
+### Window Management
+Keys for managing windows on both Mac and Windows:
+- Maximize, minimize, left/right snap
+- Lock screen, screenshot
+
+**Mac shortcuts that need manual setup:**
+- Maximize: Window -> Zoom: `Ctrl+Cmd+Z`
+- Move Left: `Ctrl+Cmd+Alt+L`
+- Move Right: `Ctrl+Cmd+Alt+R`
+
+### Layers
+- `_COLEMK`: Default Colemak-DH layout
+- `_QWERTY`: QWERTY layout
+- `_WINNAV`: Window navigation and management
+- `_VINAV`: Vi-style navigation
+- `_NUM`: Number pad
+- `_SYM`: Symbols
+- `_MOUSE`: Mouse keys
+- `_CONF`: Configuration layer
+- `_SELECT`: Selection mode
+
+## Project Structure
+
+```
+├── build.sh        # Build orchestration script
+├── dockerfile      # Docker build environment
+├── keymap.json     # QMK Configurator keymap export
+├── custom.c        # Custom keycode handlers and OLED code
+└── src/
+    ├── config.h    # QMK configuration
+    ├── rules.mk    # Build rules and features
+    ├── oneshot.c/h # One-shot modifier implementation
+    ├── swapper.c/h # Window/app switching
+    ├── tapdance.c/h# Tap dance handlers
+    └── achordion.c/h # Home row mod chord detection
+```
