@@ -101,6 +101,7 @@ enum custom_keycodes {          // Make sure have the awesome keycode ready
     MC_WINDOWLEFT,
     MC_WINDOWRIGHT,
     MC_WINDOWCLOSE,
+    MC_WINSCRRIGHT,
     MC_STOPDEF //this is the end of the list of MC keycodes, it also prints the current value of the toggle with a send string.
 };
 //KC_TRNS, KC_NO, KC_NO, KC_NO, KC_NO, KC_NO,                                   KC_NO, KC_NO, LSFT(KC_RBRC), KC_NO, KC_NO, KC_NO,
@@ -127,10 +128,11 @@ uint16_t mcwin_keys[MC_STOPDEF-MC_TOGGLE][Mcw_state_count] = {
     [MC_SNIP-MC_TOGGLE-1] = {SGUI(KC_S), LCTL(LSG(KC_4))}, //Take screen snippet into clipboard. Cmd+Ctrl+Shift+4 on mac
     [MC_LOCKSCREEN-MC_TOGGLE-1] = {LGUI(KC_L), LCTL(LGUI(KC_Q))}, //Lock screen GUI+L on Win GUI+CTL+Q mac
     [MC_WINDOWMAX-MC_TOGGLE-1] = {LGUI(KC_UP), LCTL(LGUI(KC_Z))}, //Maximize window GUI+UP on Win GUI+CTL+Z mac
-    [MC_WINDOWMIN-MC_TOGGLE-1] = {LGUI(KC_DOWN), LGUI(KC_M)}, //Close window GUI+down on Win GUI+M mac
+    [MC_WINDOWMIN-MC_TOGGLE-1] = {LGUI(KC_DOWN), LCTL(LGUI(KC_H))}, //Close window GUI+down on Win GUI+M mac
     [MC_WINDOWLEFT-MC_TOGGLE-1] = {LGUI(KC_LEFT), RALT(LCTL(LGUI(KC_L)))}, //Move window left GUI+Left on Win custom GUI+CTL+ALT+L mac
     [MC_WINDOWRIGHT-MC_TOGGLE-1] = {LGUI(KC_RIGHT), RALT(LCTL(LGUI(KC_R)))}, //Move window right GUI+R on Win custom GUI+CTL+ALT+R mac
     [MC_WINDOWCLOSE-MC_TOGGLE-1] = {LGUI(KC_W), LGUI(KC_W)}, //Close window GUI+W on Win GUI+W mac
+    [MC_WINSCRRIGHT-MC_TOGGLE-1] = {LSFT(LGUI(KC_RIGHT)), RALT(LCTL(LGUI(KC_N)))}, //Move window to next screen GUI+Shift+Right on Win custom GUI+CTL+ALT+N mac
     [MC_APPTABMOD-MC_TOGGLE-1] = {KC_LALT, KC_LGUI} //key used as a modifier to have tab act as application switcher
 };
 
@@ -254,7 +256,10 @@ void handle_alttab_press(uint16_t keycode)
     if (!is_alt_tab_active && !(keycode == ATAB_LEFT || keycode == ATAB_RIGHT)) {//if this is the first press of the alt tab(app switch)
         is_alt_tab_active = true;
         register_code16(getMcWinKey(MC_APPTABMOD));// activate the relevant modifier key for the os
-        send_tab_key(KC_TAB);// press tab once to open the menu for the OS.
+        if (keycode == ATAB_DOWN)
+            send_tab_key(KC_NUBS);// press tab once to open the menu for the OS.
+        else
+            send_tab_key(KC_TAB);// press tab once to open the menu for the OS.
         return;
     }
     if (keycode == ALT_TAB)
